@@ -7,13 +7,13 @@ def dollsort(height, width):
 	if len(height) > 2:
 		while rightmark > leftmark:
 			for i in range(leftmark, len(height)):
-				if height[i] <= height[0]:
+				if height[i] < height[0] or (height[i] == height[0] and width[0] > width[i]):
 					leftmark = leftmark + 1
 				else:
 					break
 					
 			for i in range(rightmark, 0, -1):
-				if height[0] <= height[i]:
+				if height[i] > height[0] or (height[i] == height[0] and width[0] < width[i]):
 					rightmark = rightmark - 1
 				else:
 					break
@@ -31,11 +31,33 @@ def dollsort(height, width):
 		width[0] = s1
 		height[0] = s
 		if len(height[0:rightmark]) == 0 and len(height[rightmark + 1:len(height)]) != 0:
-			return [height[rightmark]] + dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[0], [width[rightmark]] + dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			a = [height[rightmark]] 
+			b = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[0]
+			c = [width[rightmark]] 
+			d = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			a += b
+			c += d
+			return a, c
 		elif len(height[0:rightmark]) != 0 and len(height[rightmark + 1:len(height)]) == 0:
-			return dollsort(height[0:rightmark], width[0:rightmark])[0] + [height[rightmark]], dollsort(height[0:rightmark], width[0:rightmark])[1] + [width[rightmark]]
+			a = dollsort(height[0:rightmark], width[0:rightmark])[0]
+			b = [height[rightmark]] 
+			c = dollsort(height[0:rightmark], width[0:rightmark])[1]
+			d = [width[rightmark]]
+			a += b
+			c += d
+			return a, c
 		elif len(height[0:rightmark]) != 0 and len(height[rightmark + 1:len(height)]) != 0:	
-			return dollsort(height[0:rightmark], width[0:rightmark])[0] + [height[rightmark]] + dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[0], dollsort(height[0:rightmark], width[0:rightmark])[1] + [width[rightmark]] + dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			a = dollsort(height[0:rightmark], width[0:rightmark])[0]
+			b = [height[rightmark]]
+			c = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[0]
+			d = dollsort(height[0:rightmark], width[0:rightmark])[1]
+			e = [width[rightmark]]
+			f = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			a += b
+			a += c
+			d += e
+			d += f
+			return a, d
 		else:
 			return [height[rightmark]], [width[rightmark]]
 	elif len(height) == 1:
@@ -57,18 +79,22 @@ def lischeck(height, width):
 	listelements = {}
 	listi = []
 	listcounter = 1
-	biggestinchain = 0
-	for i in range(0,len(width)):
+	biggestinchainw = 0
+	biggestinchainh = 0
+	for i in range(0,len(width)): #[10, 20, 30],[20, 20, 30]
 		listi.append(i)
 		for j in range(i + 1,len(width)):
-			if listcounter == 0:
-				if width[i] < width[j] and height[i] < height[j]:
-					biggestinchain = width[j]
+			if listcounter == 1:
+				if width[i] < width[j]:
+					biggestinchainw = width[j]
+					biggestinchainh = height[j]
 					listcounter = listcounter + 1
+					comparer[i] = listcounter
 					listi.append(j)
 			else:
-				if biggestinchain < width[j] and height[i] < height[j]:
-					biggestinchain = width[j]
+				if biggestinchainw < width[j]:
+					biggestinchainw = width[j]
+					biggestinchainh = height[j]
 					listcounter = listcounter + 1
 					comparer[i] = listcounter
 					listi.append(j)
@@ -79,7 +105,9 @@ def lischeck(height, width):
 
 def dollno(height, width): #works with the example case and this case. disprove this method of solving the problem, if it is wrong.
 	tup = dollsort(height, width)
+	print tup
 	inliers = lischeck(tup[0], tup[1])
+	print inliers
 	dollstackh = []
 	dollstackw = []
 	for i in inliers:
@@ -88,13 +116,14 @@ def dollno(height, width): #works with the example case and this case. disprove 
 		height[i] = -21
 		width[i] = -21
 	i = 0
+	#print dollstackh, dollstackw, height, width
 	while i < len(height):
 		if height[i] == -21:
-			height = np.delete(height, i)
-			width = np.delete(width, i)
+			del height[i]
+			del width[i]
 		else:
 			i = i + 1
-	print dollstackh, dollstackw, height, width
+	print dollstackh, dollstackw
 	if len(height) != 0:
 		dollno(height, width)
 
@@ -113,6 +142,8 @@ if __name__ == "__main__":
 	#print "sorted- ", dollsort(h, w)
 	h = [10, 20, 20, 30, 30, 10]
 	w = [10, 20, 30, 30, 40, 20]
+	#h = [10,10,10,10,20]
+	#w = [10,20,30,40,50]
 	dollno(h, w)
 	h = []
 	w  = []
