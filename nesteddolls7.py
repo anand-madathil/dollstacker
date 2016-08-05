@@ -1,5 +1,8 @@
 import numpy as np
 
+greatest = []
+greatestindices = {}
+
 def dollsort(height, width):
 	leftmark = 1
 	rightmark = len(height) - 1
@@ -92,7 +95,6 @@ def truelischeck(list1):
 	for i in range(0, len(list1) - 1):
 		greatest[i] = lischeck(list1, i, i+1, list1[i], 1, [i])[0]
 		greatestindices[i] = lischeck(list1, i, i+1, list1[i], 1, [i])[1]
-	print greatest
 	return greatestindices[np.argmax(greatest)]
 
 def dollno(height, width): #works with the example case and this case. disprove this method of solving the problem, if it is wrong.
