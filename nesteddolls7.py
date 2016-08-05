@@ -7,13 +7,13 @@ def dollsort(height, width):
 	if len(height) > 2:
 		while rightmark > leftmark:
 			for i in range(leftmark, len(height)):
-				if height[i] < height[0] or (height[i] == height[0] and width[0] > width[i]):
+				if height[i] < height[0] or (height[i] == height[0] and width[0] < width[i]):
 					leftmark = leftmark + 1
 				else:
 					break
 					
 			for i in range(rightmark, 0, -1):
-				if height[i] > height[0] or (height[i] == height[0] and width[0] < width[i]):
+				if height[i] > height[0] or (height[i] == height[0] and width[0] > width[i]):
 					rightmark = rightmark - 1
 				else:
 					break
@@ -74,40 +74,30 @@ def dollsort(height, width):
 		else:
 			return height, width
 
-def lischeck(height, width):
-	comparer = [0]*len(width)
-	listelements = {}
-	listi = []
-	listcounter = 1
-	biggestinchainw = 0
-	biggestinchainh = 0
-	for i in range(0,len(width)): #[10, 20, 30],[20, 20, 30]
-		listi.append(i)
-		for j in range(i + 1,len(width)):
-			if listcounter == 1:
-				if width[i] < width[j]:
-					biggestinchainw = width[j]
-					biggestinchainh = height[j]
-					listcounter = listcounter + 1
-					comparer[i] = listcounter
-					listi.append(j)
+def lischeck(list1, posorig, poscomp, biggestno, value, indices):
+	if poscomp < len(list1):
+		if biggestno < list1[poscomp]:
+			if lischeck(list1, posorig, poscomp+1, list1[poscomp], value+1, np.append(indices, poscomp))[0] < lischeck(list1, posorig, poscomp+1, biggestno, value, indices)[0]:
+				return lischeck(list1, posorig, poscomp+1, biggestno, value, indices)
 			else:
-				if biggestinchainw < width[j]:
-					biggestinchainw = width[j]
-					biggestinchainh = height[j]
-					listcounter = listcounter + 1
-					comparer[i] = listcounter
-					listi.append(j)
-		listelements[i] = listi
-		listi = []
-		listcounter = 1			
-	return listelements[np.argmax(comparer)]
+				return lischeck(list1, posorig, poscomp+1, list1[poscomp], value+1, np.append(indices, poscomp))
+		else:
+			return lischeck(list1, posorig, poscomp+1, biggestno, value, indices)
+	else:
+		return value, indices
+
+def truelischeck(list1):
+	global greatest
+	greatest = [0]*len(list1)
+	for i in range(0, len(list1) - 1):
+		greatest[i] = lischeck(list1, i, i+1, list1[i], 1, [i])[0]
+		greatestindices[i] = lischeck(list1, i, i+1, list1[i], 1, [i])[1]
+	print greatest
+	return greatestindices[np.argmax(greatest)]
 
 def dollno(height, width): #works with the example case and this case. disprove this method of solving the problem, if it is wrong.
 	tup = dollsort(height, width)
-	print tup
-	inliers = lischeck(tup[0], tup[1])
-	print inliers
+	inliers = truelischeck(tup[1])
 	dollstackh = []
 	dollstackw = []
 	for i in inliers:
