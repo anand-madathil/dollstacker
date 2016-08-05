@@ -21,6 +21,7 @@ def dollsort(height, width):
 				else:
 					break
 			if rightmark > leftmark:
+				print "swapping", height[rightmark], width[rightmark], "with", height[leftmark], width[leftmark]
 				s = height[rightmark]
 				s1 = width[rightmark]
 				height[rightmark] = height[leftmark]
@@ -38,6 +39,7 @@ def dollsort(height, width):
 			b = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[0]
 			c = [width[rightmark]] 
 			d = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			print b, d
 			a += b
 			c += d
 			return a, c
@@ -46,6 +48,7 @@ def dollsort(height, width):
 			b = [height[rightmark]] 
 			c = dollsort(height[0:rightmark], width[0:rightmark])[1]
 			d = [width[rightmark]]
+			print a, c
 			a += b
 			c += d
 			return a, c
@@ -56,17 +59,19 @@ def dollsort(height, width):
 			d = dollsort(height[0:rightmark], width[0:rightmark])[1]
 			e = [width[rightmark]]
 			f = dollsort(height[rightmark + 1:len(height)], width[rightmark + 1:len(height)])[1]
+			print a, c, d, f
 			a += b
 			a += c
 			d += e
 			d += f
 			return a, d
 		else:
+			print [height[rightmark]], [width[leftmark]]
 			return [height[rightmark]], [width[rightmark]]
 	elif len(height) == 1:
 		return height, width
 	elif len(height) == 2:
-		if height[1] < height[0]:
+		if height[1] < height[0] or ((height[1] == height[0]) and (width[1] > width[0])):
 			s = height[1]
 			s1 = width[1]
 			height[1] = height[0]
